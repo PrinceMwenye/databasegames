@@ -21,10 +21,20 @@ public class snake : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.UpArrow)) { gridMoveDirection.x = 0; gridMoveDirection.y = +1; }
-        if (Input.GetKeyDown(KeyCode.DownArrow)) { gridMoveDirection.x = 0; gridMoveDirection.y = -1; }
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) { gridMoveDirection.x = -1; gridMoveDirection.y = 0; }
-        if (Input.GetKeyDown(KeyCode.RightArrow)) { gridMoveDirection.x = +1; gridMoveDirection.y = 0; }
+        if (Input.GetKeyDown(KeyCode.UpArrow)) {
+            if (gridMoveDirection.y != -1) { gridMoveDirection.x = 0; gridMoveDirection.y = +1; } }
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            if (gridMoveDirection.y != +1) { gridMoveDirection.x = 0; gridMoveDirection.y = -1; }
+        }
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            if (gridMoveDirection.x != +1) { gridMoveDirection.x = -1; gridMoveDirection.y = 0; }
+        }
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            if (gridMoveDirection.x != -1) { gridMoveDirection.x = +1; gridMoveDirection.y = 0; }
+        }
 
         gridMoveTimer += Time.deltaTime;
         if(gridMoveTimer > gridMoveTimerMax)
@@ -35,6 +45,14 @@ public class snake : MonoBehaviour
 
 
         transform.position = new Vector3(gridPosition.x, gridPosition.y);
+        transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(gridMoveDirection) -90);
 
+    }
+
+    private float GetAngleFromVector(Vector2Int dir)
+    {
+        float n = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        if (n < 0) n += 360;
+        return n;
     }
 }

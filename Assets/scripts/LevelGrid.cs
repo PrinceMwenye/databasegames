@@ -13,7 +13,6 @@ public class LevelGrid
     {this.width = width;
        this.height = height;
 
-
     }
 
     public void Setup(snake snake) { this.snake = snake; SpawnFood();
@@ -32,14 +31,20 @@ public class LevelGrid
         foodGameObject.transform.position = new Vector3(foodGridPosition.x, foodGridPosition.y);
     }
 
-    public void SnakeMoved(Vector2Int snakeGridPosition)
+    public bool TrySnakeEatFood(Vector2Int snakeGridPosition)
     {
         if (snake.GetGridPosition() == foodGridPosition)
         {
             Object.Destroy(foodGameObject);
             SpawnFood();
+            return true;
            
+        } else
+        {
+            return false;   
         }
     }
+
+  
 
 }

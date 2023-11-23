@@ -9,7 +9,7 @@ public class snake : MonoBehaviour
 {
     private enum Direction
     {
-        Left,
+        Left, Right, Up, Down
     }
     private Vector2Int gridMoveDirection;
     private Vector2Int gridPosition;
@@ -18,7 +18,7 @@ public class snake : MonoBehaviour
     private LevelGrid levelGrid;
     private int snakeBodySize;
     private List<Vector2Int> snakeMovePositionList;
-    private List<Transform> snakeBodyTransformList;
+    private List<SnakeBodyPart> SnakeBodyPartList;
 
     private void Awake()
     {
@@ -28,7 +28,7 @@ public class snake : MonoBehaviour
         gridMoveDirection = new Vector2Int(1, 0);
         snakeMovePositionList = new List<Vector2Int>();
         snakeBodySize = 1;
-        snakeBodyTransformList = new List<Transform>();
+        SnakeBodyPartList = new List<SnakeBodyPart>();
 
     }
 
@@ -78,10 +78,10 @@ public class snake : MonoBehaviour
 
         transform.position = new Vector3(gridPosition.x, gridPosition.y);
         transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(gridMoveDirection) -90);
-        for (int i = 0; i < snakeBodyTransformList.Count; i++) {
-            Vector3 snakeBodyPosition = new Vector3(snakeMovePositionList[i].x, snakeMovePositionList[i].y);
-            snakeBodyTransformList[i].position = snakeBodyPosition;
-        }
+
+        UpdateSnakeBodyParts();
+
+       
 
 
 
@@ -94,12 +94,18 @@ public class snake : MonoBehaviour
         
     }
 
+
+    private void UpdateSnakeBodyParts()
+    {
+        for (int i = 0; i < SnakeBodyPartList.Count; i++)
+        {
+            SnakeBodyPartList[i].SetGridPosition(snakeMovePositionList[i]);
+        }
+    }
+
     private void CreateSnakeBody()
     {
-        GameObject snakeBodyGameObject = new("SnakeBody", typeof(SpriteRenderer));
-        snakeBodyGameObject.GetComponent<SpriteRenderer>().sprite = GameAssets.i.snakeBodySprite;
-        snakeBodyTransformList.Add(snakeBodyGameObject.transform);
-        snakeBodyGameObject.GetComponent<SpriteRenderer>().sortingOrder = -snakeBodyTransformList.Count;
+        SnakeBodyPartList.Add(new SnakeBodyPart(SnakeBodyPartList.Count));
     }
 
 
@@ -122,6 +128,27 @@ public class snake : MonoBehaviour
         return gridPositionList;
     }
 
+
+    public class SnakeBodyPart
+    {
+
+        private Vector2Int gridPosition;
+        private Transform transform;
+        public SnakeBodyPart(int bodyIndex)
+        {
+            GameObject snakeBodyGameObject = new("SnakeBody", typeof(SpriteRenderer));
+            snakeBodyGameObject.GetComponent<SpriteRenderer>().sprite = GameAssets.i.snakeBodySprite;
+            snakeBodyGameObject.GetComponent<SpriteRenderer>().sortingOrder = -bodyIndex;
+            transform = snakeBodyGameObject.transform;
+        }
+
+        public void SetGridPosition(Vector2Int gridPosition)
+        {
+            this.gridPosition = gridPosition;
+            transform.position = new Vector3(gridPosition.x, gridPosition.y);
+        }
+
+    }
   
   
 }

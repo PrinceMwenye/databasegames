@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class LevelGrid 
@@ -18,6 +19,7 @@ public class LevelGrid
     public void Setup(snake snake) { this.snake = snake; SpawnFood();
     }
 
+    //Get food from GameAssets
     private void SpawnFood()
     {
         do
@@ -37,6 +39,7 @@ public class LevelGrid
         {
             Object.Destroy(foodGameObject);
             SpawnFood();
+            GameHandler.AddScore();
             return true;
            
         } else
@@ -45,6 +48,26 @@ public class LevelGrid
         }
     }
 
-  
+    //Ensure it does not go out of bounds
+  public Vector2Int ValidateGridPosition(Vector2Int gridPosition)
+    {
+        if (gridPosition.x < 0)
+        {
+            gridPosition.x = width - 1;
+        }
+        if (gridPosition.x > width-1)
+        {
+            gridPosition.x = 0;
+        }
+        if (gridPosition.y < 0)
+        {
+           gridPosition.y = height - 1;
+        }
+        if (gridPosition.y > height - 1)
+        {
+            gridPosition.y = 0;
+        }
+        return gridPosition;
+    }
 
 }

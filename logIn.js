@@ -21,9 +21,6 @@ const app = express();
 
 const expireTime = 60 * 60 * 1000; //expires after 1 day  (hours * minutes * seconds * millis)
 
-
-
-
 /* secret information section */
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;;
@@ -55,3 +52,37 @@ app.use(session({
         maxAge: 1000 * 60 * 60 // 1 hour
     }
 }));
+
+
+app.post("/login", async (req, res) => {
+    const user = req.body.username;
+    const password = req.body.password;
+    const results = await db_users.getUser({ user: user });
+  
+    if (results) {
+      if (results.length === 1) {
+        // Ensure there is exactly one matching user
+        const storedHashedPassword = results[0].password;
+  
+        // Compare the user-entered password with the stored hashed password
+        if (bcrypt.compareSync(password, storedHashedPassword)) {
+          req.session.authenticated = true;
+          req.session.user = results[0].username;
+          req.session.user_id = results[0].user_id;
+          req.session.cookie.maxAge = expireTime;
+          res.redirect("/home?image=true");
+          return;
+          // Handle the login success case here
+        } else {
+          console.log("Invalid password");
+          // Handle the invalid password case here
+        }
+      } else {
+        console.log(
+          "Invalid number of users matched: " + results.length + " (expected 1)."
+        );
+        // Handle the case where multiple users match the query
+      }
+    }
+    res.redirect("/login?invalid=true");
+  });

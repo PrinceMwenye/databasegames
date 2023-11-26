@@ -31,7 +31,7 @@ public class LogInManager : MonoBehaviour
 
         string jsonData = JsonUtility.ToJson(requestData);
 
-        using (UnityWebRequest www = UnityWebRequest.Post(serverURL, "POST"))
+        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(serverURL, "POST"))
         {
             byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
             www.uploadHandler = new UploadHandlerRaw(bodyRaw);

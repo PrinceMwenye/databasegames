@@ -716,7 +716,7 @@ GameObject:
   - component: {fileID: 401726465}
   - component: {fileID: 401726464}
   m_Layer: 5
-  m_Name: Submit
+  m_Name: SignUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -786,9 +786,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: LogInManager, Assembly-CSharp
-        m_MethodName: OnSubmitLogIn
+      - m_Target: {fileID: 1678090746}
+        m_TargetAssemblyTypeName: SignUpManager, Assembly-CSharp
+        m_MethodName: OnSubmitSignUp
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1100,14 +1100,14 @@ MonoBehaviour:
   m_VerticalScrollbarEventHandler: {fileID: 0}
   m_LayoutGroup: {fileID: 0}
   m_ScrollSensitivity: 1
-  m_ContentType: 5
+  m_ContentType: 6
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 7
   m_LineType: 0
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
-  m_CharacterValidation: 5
+  m_CharacterValidation: 7
   m_RegexValue: 
   m_GlobalPointSize: 14
   m_CharacterLimit: 20
@@ -1988,6 +1988,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1678090745}
+  - component: {fileID: 1678090746}
   m_Layer: 0
   m_Name: SignUpManager
   m_TagString: Untagged
@@ -2010,6 +2011,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1678090746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1678090744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58911b3de9ab4f04197688dec99ae2a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  emailInput: {fileID: 694369318}
+  passwordInput: {fileID: 1321805325}
+  signupButton: {fileID: 401726464}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

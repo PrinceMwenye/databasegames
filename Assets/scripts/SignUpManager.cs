@@ -61,7 +61,7 @@ public class SignUpManager : MonoBehaviour
                 try
                 {
                     response = JsonUtility.FromJson<SignupResponse>(www.downloadHandler.text);
-                    Debug.Log(response.message);
+                    Debug.Log("Response " + response.message);
                 }
                 catch (Exception e)
                 {

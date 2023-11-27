@@ -24,19 +24,23 @@ async function createUser(postData) {
 }
 
 async function getUser(postData) {
-    console.log("Checking users in database" + postData);
+    console.log("Checking users in database " + postData);
     console.log(postData);
     let getUsersSQL = `
 		SELECT *
 		FROM SnakeUser
-		WHERE username = :useremail;
+		WHERE username = :username;
 	`;
     let params = {
-        useremail: postData.email,
+        username: postData,
     };
     try {
         const results = await database.query(getUsersSQL, params);
-        return results.length > 0;
+        if (results[0].length > 0) {
+            return true;
+        } else {
+            return false;
+        };
 
     } catch (err) {
         console.log("Error getting users");

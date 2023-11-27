@@ -103,26 +103,8 @@ app.post("/signup", async (req, res) => {
   console.log('Password ' + password)
 
 
-  const checkEmail = () => {
-    if (!email) {
-      return true;
-    }
-    const userExists = db_users.getUser({
-      useremail: email
-    });
-    if (userExists.length <= 0) {
-      return true;
-    }
-    return false;
-  };
-
-  const isUserInvalid = checkEmail();
-
-  if (isUserInvalid) {
-    return;
-  }
-
   const userExists = await db_users.getUser(email);
+  console.log(userExists);
   if (userExists) {
     console.log("User already exists")
   } else {

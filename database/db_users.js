@@ -2,14 +2,14 @@ const database = include("mySQLDatabaseConnection");
 
 async function createUser(postData) {
     let createUserSQL = `
-		INSERT INTO user
+		INSERT INTO SnakeUser
 		(username, password)
 		VALUES
-		(:username,  :passwordHash);
+		(:useremail,  :passwordHash);
 	`;
 
     let params = {
-        username: postData.username,
+        useremail: postData.email,
         passwordHash: postData.password,
     };
 
@@ -28,11 +28,11 @@ async function getUser(postData) {
     console.log(postData);
     let getUsersSQL = `
 		SELECT *
-		FROM user
+		FROM SnakeUser
 		WHERE username = :username;
 	`;
     let params = {
-        username: postData.user,
+        useremail: postData.email,
     };
     try {
         const results = await database.query(getUsersSQL, params);

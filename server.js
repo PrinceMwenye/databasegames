@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 const database = include('mySQLDatabaseConnection');
 const db_utils = include('./database/db_utils.js');
-const db_users = include('database/users');
+const db_users = include('database/db_users');
 
 const success = db_utils.printMySQLVersion();
 
@@ -21,7 +21,7 @@ const port = process.env.PORT || 3000;
 const app = express();
 
 const expireTime = 60 * 60 * 1000; //expires after 1 day  (hours * minutes * seconds * millis)
-app.use(express.json()); // Add this line to parse JSON requests
+app.use(express.json());
 
 /* secret information section */
 const mongodb_user = process.env.MONGODB_USER;
@@ -93,98 +93,54 @@ app.post("/login", async (req, res) => {
   res.redirect("/login?invalid=true");
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-});
+
 
 
 app.post("/signup", async (req, res) => {
-  console.log(req.body);
-
+  console.log("Body items " + req.body.email);
   const {
     email,
     password
   } = req.body;
+  console.log("Email " + email)
+  console.log('Password ' + password)
 
-  console.log("Email: " + email);
-  console.log("Password: " + password);
 
-  // Now you can use 'email' and 'password' as needed in your server logic
+  const checkEmail = () => {
+    if (!email) {
+      return true;
+    }
+    const userExists = db_users.getUser({
+      useremail: email
+    });
+    if (userExists.length <= 0) {
+      return true;
+    }
+    return false;
+  };
+
+  const isUserInvalid = checkEmail();
+
+  if (isUserInvalid) {
+    return;
+  }
+  try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const success = await db_users.createUser({
+      email: email,
+      password: hashedPassword,
+    });
+    if (success) {
+      console.log("User created successfully");
+    } else {
+      console.error("YIkes Failed to create user");
+    }
+  } catch (error) {
+    console.error("Error while creating user:", error);
+  }
 });
 
 
-
-// app.post("/signup", async (req, res) => {
-//   console.log("Body items " + req.body.email);
-//   const {
-//     email,
-//     password
-//   } = req.body;
-//   console.log("Email" + email)
-//   console.log('Password ' + password)
-
-// const checkPassword = () => {
-//   if (password.length < 10) {
-//     passwordValidClass = "is-invalid";
-//     passwordInvalidMessage = "Password must be at least 10 characters";
-//     return true;
-//   }
-//   if (!password.match(/[a-z]/)) {
-//     passwordValidClass = "is-invalid";
-//     passwordInvalidMessage = "Password must contain a lowercase letter";
-//     return true;
-//   }
-//   if (!password.match(/[A-Z]/)) {
-//     passwordValidClass = "is-invalid";
-//     passwordInvalidMessage = "Password must contain an uppercase letter";
-//     return true;
-//   }
-//   if (!password.match(/[|\\/~^:,;?!&%$@*+]/)) {
-//     passwordValidClass = "is-invalid";
-//     passwordInvalidMessage = "Password must contain a special character";
-//     return true;
-//   }
-//   return false;
-// };
-
-// const checkEmail = () => {
-//   if (!email) {
-//     userValidClass = "is-invalid";
-//     userInvalidMessage = "Please enter your username";
-//     return true;
-//   }
-//   const userExists = db_users.getUser({
-//     user: username
-//   });
-//   if (userExists.length <= 0) {
-//     userValidClass = "is-invalid";
-//     userInvalidMessage = "Username already exists";
-//     return true;
-//   }
-//   return false;
-// };
-
-// const isPasswordInvalid = checkPassword();
-// const isUserInvalid = checkEmail();
-
-// if (isPasswordInvalid || isUserInvalid) {
-//   return;
-// }
-// try {
-//   const hashedPassword = await bcrypt.hash(password, saltRounds);
-//   const success = await db_users.createUser({
-//     username: username,
-//     password: hashedPassword,
-//   });
-//   if (success) {
-//     console.log("User created successfully");
-//     res.redirect("/login");
-//   } else {
-//     console.error("YIkes Failed to create user");
-//     res.redirect("/signUp");
-//   }
-// } catch (error) {
-//   console.error("Error while creating user:", error);
-//   res.redirect("/signUp");
-// }
-// });
+app.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
+});

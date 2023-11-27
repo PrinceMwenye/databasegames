@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Text;
+using System;
 
 public class LogInManager : MonoBehaviour
 {
@@ -11,29 +13,42 @@ public class LogInManager : MonoBehaviour
     [SerializeField] TMP_InputField userPassword;
     [SerializeField] Button loginButton;
 
-    private string serverURL = "http://localhost:3000/login"; // Adjust the port as needed
+    private string serverURL = "http://localhost:3000/login";
+
+    [System.Serializable]
+    public class LoginData
+    {
+        public string email;
+        public string password;
+    }
+
+    [System.Serializable]
+    public class LoginResponse
+    {
+        public string message;
+    }
 
     public void OnSubmitLogIn()
     {
         string email = userEmail.text;
         string password = userPassword.text;
 
-        StartCoroutine(LoginRequest(email, password));
-    }
-
-    IEnumerator LoginRequest(string email, string password)
-    {
-        var requestData = new
+        LoginData loginData = new LoginData
         {
             email = email,
             password = password
         };
 
-        string jsonData = JsonUtility.ToJson(requestData);
+        StartCoroutine(LoginRequest(loginData));
+    }
 
-        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(serverURL, "POST"))
+    IEnumerator LoginRequest(LoginData loginData)
+    {
+        string jsonData = JsonUtility.ToJson(loginData);
+
+        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(serverURL, jsonData))
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
             www.uploadHandler = new UploadHandlerRaw(bodyRaw);
             www.downloadHandler = new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
@@ -44,24 +59,28 @@ public class LogInManager : MonoBehaviour
             {
                 Debug.Log("Server Response: " + www.downloadHandler.text);
 
-                LoginResponse response = JsonUtility.FromJson<LoginResponse>(www.downloadHandler.text);
+                LoginResponse response = null;
 
-                // Only load the scene upon successful login
-                if (response.message == "Login successful")
+                try
+                {
+                    response = JsonUtility.FromJson<LoginResponse>(www.downloadHandler.text);
+                    Debug.Log(response.message);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Error parsing JSON response: {e}");
+                }
+
+                if (response != null && response.message == "Login successful")
                 {
                     SceneManager.LoadScene(1);
                 }
             }
             else
             {
-                Debug.LogError("Network Error: " + www.error);
+                Debug.LogError($"Network Error: {www.responseCode}, {www.error}");
             }
         }
     }
 
-    [System.Serializable]
-    public class LoginResponse
-    {
-        public string message;
-    }
 }

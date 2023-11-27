@@ -99,14 +99,17 @@ app.post("/signup", async (req, res) => {
     email,
     password
   } = req.body;
-  console.log("Email " + email)
-  console.log('Password ' + password)
-
+  console.log("Email " + email);
+  console.log('Password ' + password);
 
   const userExists = await db_users.getUser(email);
   console.log(userExists);
+
   if (userExists) {
-    console.log("User already exists")
+    console.log("User already exists");
+    res.status(409).json({
+      message: "User already exists"
+    });
   } else {
     try {
       const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -116,15 +119,24 @@ app.post("/signup", async (req, res) => {
       });
       if (success) {
         console.log("User created successfully");
+        res.status(200).json({
+          message: "Signup successful"
+        });
       } else {
-        console.error("YIkes Failed to create user");
+        console.error("Yikes! Failed to create user");
+        res.status(500).json({
+          message: "Internal server error"
+        });
       }
     } catch (error) {
       console.error("Error while creating user:", error);
+      res.status(500).json({
+        message: "Internal server error"
+      });
     }
   }
-
 });
+
 
 
 app.listen(PORT, () => {

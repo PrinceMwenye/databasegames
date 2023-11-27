@@ -46,40 +46,38 @@ public class LogInManager : MonoBehaviour
     {
         string jsonData = JsonUtility.ToJson(loginData);
 
-        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(serverURL, jsonData))
+        using UnityWebRequest www = UnityWebRequest.PostWwwForm(serverURL, jsonData);
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+        www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+
+        yield return www.SendWebRequest();
+
+        if (www.result == UnityWebRequest.Result.Success)
         {
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
-            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            www.downloadHandler = new DownloadHandlerBuffer();
-            www.SetRequestHeader("Content-Type", "application/json");
+            Debug.Log("Server Response: " + www.downloadHandler.text);
 
-            yield return www.SendWebRequest();
+            LoginResponse response = null;
 
-            if (www.result == UnityWebRequest.Result.Success)
+            try
             {
-                Debug.Log("Server Response: " + www.downloadHandler.text);
-
-                LoginResponse response = null;
-
-                try
-                {
-                    response = JsonUtility.FromJson<LoginResponse>(www.downloadHandler.text);
-                    Debug.Log(response.message);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"Error parsing JSON response: {e}");
-                }
-
-                if (response != null && response.message == "Login successful")
-                {
-                    SceneManager.LoadScene(1);
-                }
+                response = JsonUtility.FromJson<LoginResponse>(www.downloadHandler.text);
+                Debug.Log(response.message);
             }
-            else
+            catch (Exception e)
             {
-                Debug.LogError($"Network Error: {www.responseCode}, {www.error}");
+                Debug.LogError($"Error parsing JSON response: {e}");
             }
+
+            if (response != null && response.message == "Login successful")
+            {
+                SceneManager.LoadScene(1);
+            }
+        }
+        else
+        {
+            Debug.LogError($"Network Error: {www.responseCode}, {www.error}");
         }
     }
 

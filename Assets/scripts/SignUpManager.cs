@@ -42,45 +42,44 @@ public class SignUpManager : MonoBehaviour
 
         Debug.Log($"Request JSON: {jsonData}");
 
-        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(serverURL, "POST"))
+        using UnityWebRequest www = UnityWebRequest.PostWwwForm(serverURL, "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+        www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+
+        yield return www.SendWebRequest();
+        Debug.Log(www.result);
+
+        if (www.result == UnityWebRequest.Result.Success)
         {
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
-            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            www.downloadHandler = new DownloadHandlerBuffer();
-            www.SetRequestHeader("Content-Type", "application/json");
+            Debug.Log($"Server Response Code: {www.responseCode}");
+            Debug.Log($"Server Response: {www.downloadHandler.text}");
 
-            yield return www.SendWebRequest();
+            SignupResponse response = null;
 
-            if (www.result == UnityWebRequest.Result.Success)
+            try
             {
-                Debug.Log($"Server Response Code: {www.responseCode}");
-                Debug.Log($"Server Response: {www.downloadHandler.text}");
+                response = JsonUtility.FromJson<SignupResponse>(www.downloadHandler.text);
+                Debug.Log("SERVER's Response " + response.message);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error parsing JSON response: {e}");
+            }
 
-                SignupResponse response = null;
-
-                try
-                {
-                    response = JsonUtility.FromJson<SignupResponse>(www.downloadHandler.text);
-                    Debug.Log("Response " + response.message);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"Error parsing JSON response: {e}");
-                }
-
-                if (response != null && response.message == "Signup successful")
-                {
-                    SceneManager.LoadScene(1); // Adjust the scene index as needed
-                }
-                else
-                {
-                    Debug.LogWarning("Signup not successful. Response may not match expected format.");
-                }
+            if (response != null && response.message == "Signup successful")
+            {
+                SceneManager.LoadScene(1); // Adjust the scene index as needed
             }
             else
             {
-                Debug.LogError($"Network Error: {www.error}");
+                Debug.LogWarning("Signup not successful. Response may not match expected format.");
             }
+        }
+        else
+        {
+            Debug.LogError($"Network Error: {www.error}");
         }
     }
 

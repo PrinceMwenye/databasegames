@@ -76,7 +76,6 @@ app.post("/login", async (req, res) => {
         req.session.user = results[0].username;
         req.session.user_id = results[0].user_id;
         req.session.cookie.maxAge = expireTime;
-        res.redirect("/home?image=true");
         return;
         // Handle the login success case here
       } else {
@@ -92,8 +91,6 @@ app.post("/login", async (req, res) => {
   }
   res.redirect("/login?invalid=true");
 });
-
-
 
 
 app.post("/signup", async (req, res) => {
@@ -124,20 +121,27 @@ app.post("/signup", async (req, res) => {
   if (isUserInvalid) {
     return;
   }
-  try {
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const success = await db_users.createUser({
-      email: email,
-      password: hashedPassword,
-    });
-    if (success) {
-      console.log("User created successfully");
-    } else {
-      console.error("YIkes Failed to create user");
+
+  const userExists = await db_users.getUser(email);
+  if (userExists) {
+    console.log("User already exists")
+  } else {
+    try {
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      const success = await db_users.createUser({
+        email: email,
+        password: hashedPassword,
+      });
+      if (success) {
+        console.log("User created successfully");
+      } else {
+        console.error("YIkes Failed to create user");
+      }
+    } catch (error) {
+      console.error("Error while creating user:", error);
     }
-  } catch (error) {
-    console.error("Error while creating user:", error);
   }
+
 });
 
 

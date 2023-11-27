@@ -29,16 +29,15 @@ async function getUser(postData) {
     let getUsersSQL = `
 		SELECT *
 		FROM SnakeUser
-		WHERE username = :username;
+		WHERE username = :useremail;
 	`;
     let params = {
         useremail: postData.email,
     };
     try {
         const results = await database.query(getUsersSQL, params);
-        if (results) {
-            return results[0];
-        }
+        return results.length > 0;
+
     } catch (err) {
         console.log("Error getting users");
         console.log(err);

@@ -57,40 +57,54 @@ app.use(session({
 
 
 app.post("/login", async (req, res) => {
-  console.log("inside log in")
+  console.log("inside log in");
   console.log(req.body.email);
-  const user = req.body.email;
+
+  const email = req.body.email;
   const password = req.body.password;
-  const results = await db_users.getUser({
-    user: user
+
+  const results = await db_users.getUserLogIn({
+    email,
   });
 
   if (results) {
     if (results.length === 1) {
-      // Ensure there is exactly one matching user
       const storedHashedPassword = results[0].password;
 
-      // Compare the user-entered password with the stored hashed password
       if (bcrypt.compareSync(password, storedHashedPassword)) {
+        // Login successful
         req.session.authenticated = true;
         req.session.user = results[0].username;
         req.session.user_id = results[0].user_id;
-        req.session.cookie.maxAge = expireTime;
+
+        // Send a success response to the client
+        res.status(200).json({
+          message: "Login successful"
+        });
         return;
-        // Handle the login success case here
       } else {
+        // Invalid password
         console.log("Invalid password");
-        // Handle the invalid password case here
+        res.status(401).json({
+          message: "Invalid password"
+        });
       }
     } else {
-      console.log(
-        "Invalid number of users matched: " + results.length + " (expected 1)."
-      );
-      // Handle the case where multiple users match the query
+      // Multiple users matched the query
+      console.log("Invalid number of users matched: " + results.length + " (expected 1).");
+      res.status(500).json({
+        message: "Internal server error"
+      });
     }
+  } else {
+    // No user found
+    console.log("User not found");
+    res.status(404).json({
+      message: "User not found"
+    });
   }
-  res.redirect("/login?invalid=true");
 });
+
 
 
 app.post("/signup", async (req, res) => {

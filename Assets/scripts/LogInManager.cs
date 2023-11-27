@@ -13,6 +13,7 @@ public class LogInManager : MonoBehaviour
     [SerializeField] TMP_InputField userPassword;
     [SerializeField] Button loginButton;
 
+
     private string serverURL = "http://localhost:3000/login";
 
     [System.Serializable]
@@ -27,6 +28,10 @@ public class LogInManager : MonoBehaviour
     {
         public string message;
     }
+
+
+
+
 
     public void OnSubmitLogIn()
     {
@@ -72,7 +77,7 @@ public class LogInManager : MonoBehaviour
 
             if (response != null && response.message == "Login successful")
             {
-                SceneManager.LoadScene(1);
+                SceneManager.LoadScene(2);
             }
         }
         else

@@ -49,7 +49,32 @@ async function getUser(postData) {
     }
 }
 
+
+async function getUserLogIn(postData) {
+    console.log("Checking users in database " + postData.email);
+    console.log(postData);
+    let getUsersSQL = `
+		SELECT *
+		FROM SnakeUser
+		WHERE username = :useremail;
+	`;
+    let params = {
+        useremail: postData.email,
+    };
+    try {
+        const results = await database.query(getUsersSQL, params);
+        console.log("vailable " + results[0])
+        return results[0];
+
+    } catch (err) {
+        console.log("Error getting users");
+        console.log(err);
+        return false;
+    }
+}
+
 module.exports = {
     createUser,
-    getUser
+    getUser,
+    getUserLogIn
 };

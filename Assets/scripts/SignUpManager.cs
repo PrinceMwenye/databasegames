@@ -12,6 +12,7 @@ public class SignUpManager : MonoBehaviour
     [SerializeField] TMP_InputField emailInput;
     [SerializeField] TMP_InputField passwordInput;
     [SerializeField] Button signupButton;
+    [SerializeField] Button LogInButton;
 
     private string serverURL = "http://localhost:3000/signup";
 
@@ -20,6 +21,12 @@ public class SignUpManager : MonoBehaviour
     {
         public string email;
         public string password;
+    }
+
+    public void OnSubmitUserAlreadyHasAccount()
+    {
+        SceneManager.LoadScene(1); 
+
     }
 
     public void OnSubmitSignUp()

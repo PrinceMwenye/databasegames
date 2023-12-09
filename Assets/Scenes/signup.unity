@@ -1597,7 +1597,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1678090746}
         m_TargetAssemblyTypeName: SignUpManager, Assembly-CSharp
-        m_MethodName: OnSubmitSignUp
+        m_MethodName: OnSubmitUserAlreadyHasAccount
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2160,6 +2160,7 @@ MonoBehaviour:
   emailInput: {fileID: 694369318}
   passwordInput: {fileID: 1321805325}
   signupButton: {fileID: 401726464}
+  LogInButton: {fileID: 1313442259}
 --- !u!1 &1776230698
 GameObject:
   m_ObjectHideFlags: 0

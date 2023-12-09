@@ -48,7 +48,6 @@ public class LevelGrid
         }
     }
 
-    //Ensure it does not go out of bounds
   public Vector2Int ValidateGridPosition(Vector2Int gridPosition)
     {
         if (gridPosition.x < 0)
